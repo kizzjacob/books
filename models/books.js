@@ -22,6 +22,7 @@ module.exports = (sequelize, Sequelize) => {
     const Book = sequelize.define("books", {
         id:{primaryKey:true,type:INTEGER,autoIncrement:true},
         hex: { type: STRING, unique: true },
+        picture: { type: Array(STRING), defaultValue: [] },
         title: { type: STRING },
         desc: { type: TEXT },
         isbn: { type: STRING, unique: true },
