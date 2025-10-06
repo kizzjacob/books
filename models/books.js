@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-    const{INTEGER,STRING,TEXT,DATE} = Sequelize;
+    const{INTEGER,STRING,TEXT,DATE,ARRAY} = Sequelize;
 
     const Store = sequelize.define("stores", {
         id:{primaryKey:true,type:INTEGER,autoIncrement:true},

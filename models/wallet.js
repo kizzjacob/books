@@ -1,4 +1,5 @@
-  // ...existing code...
+module.exports = (sequelize, { STRING, INTEGER, DATE, TEXT }) => {
+     const{INTEGER,STRING,DATE,TEXT} = Sequelize;
     const Wallet = sequelize.define("wallets", {
         id: { primaryKey: true, type: INTEGER, autoIncrement: true },
         hex: { type: STRING, unique: true },
@@ -18,3 +19,26 @@
            
         ]
     });
+
+    const Transaction = sequelize.define("transactions", {
+        id: { primaryKey: true, type: INTEGER, autoIncrement: true },
+        hex: { type: STRING, unique: true },
+        walletId: { type: INTEGER, reference: { model: 'wallets', key: 'hex' } },
+        amount: { type: INTEGER },
+        type: { type: STRING },
+        method: { type: STRING },
+        reference: { type: STRING },
+        status: { type: STRING, defaultValue: 'pending' },
+
+    },{
+        timestamps: true,
+        tableName: 'transactions',
+        indexes:[
+            {unique:true,fields:['hex']},{fields:['walletId']},{fields:['amount']},{fields:['type']},
+            {fields:['method']},{fields:['reference']},{fields:['status']},{fields:['createdAt']},{fields:['updatedAt']}
+
+        ]
+    });
+
+    return{Transaction,Wallet};
+}
