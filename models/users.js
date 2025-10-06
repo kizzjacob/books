@@ -1,55 +1,56 @@
 module.exports = (sequelize, Sequelize) => {
-    const {INTEGER,STRING,TEXT} = Sequelize;
-    const Customer = sequelize.define("customer", {
+    const{INTEGER,STRING,TEXT,DATE} = Sequelize;
+    const User = sequelize.define("users", {
         id:{primaryKey:true,type:INTEGER,autoIncrement:true},
-        firstName: { type: Sequelize.STRING },
-        lastName: { type: Sequelize.STRING },
-        email: { type: Sequelize.STRING },
-        password: { type: Sequelize.STRING },
-        phone: { type: Sequelize.STRING },
-        shippingAddress: { type: Sequelize.STRING },
-        billingAddress: { type: Sequelize.STRING },
+        username:{unique:true,type:STRING},
+        name: { type: STRING },
+        phone: { type: STRING },
+        email: { type: STRING, unique: true },
+        password: { type: STRING },
     },{
         timestamps: true,
-        tableName: 'customers',
+        tableName: 'users',
         indexes:[
-            {unique:true,fields:['email']},{fields:['lastName']},{fields:['firstName']},
-            {fields:['phone']},{fields:['createdAt']},{fields:['updatedAt']},{fields:['shippingAddress']},
-            {fields:['billingAddress']},
+            {unique:true,fields:['email',]},{unique:true,fields:['username']},{fields:['name']},
+            {fields:['createdAt']},{fields:['updatedAt']},{fields:['phone']},
         ]
     });
 
-    const Publisher = sequelize.define("publisher", {
+    const Role = sequelize.define("roles", {
         id:{primaryKey:true,type:INTEGER,autoIncrement:true},
-        firstName: { type: Sequelize.STRING },
-        lastName: { type: Sequelize.STRING },
-        email: { type: Sequelize.STRING },
-        phone: { type: Sequelize.STRING },
-        address: { type: Sequelize.STRING },
+        hex: { type: STRING, unique: true },
+        name: { type: STRING, unique: true },
+        privileges: { type: TEXT },
+        user: { type: INTEGER,reference:{model:'users',key:'id'} },
+        expiry: { type:DATE, defaultValue: null },
     },{
         timestamps: true,
-        tableName: 'publishers',
+        tableName: 'roles',
         indexes:[
-            {unique:true,fields:['email']},{fields:['lastName']},{fields:['firstName']},
-            {fields:['phone']},{fields:['createdAt']},{fields:['updatedAt']},{fields:['address']},
+            {unique:true,fields:['hex']},{unique:true,fields:['name']},{fields:['user']},
+            {fields:['createdAt']},{fields:['updatedAt']},{fields:['expiry']},{fields:['privileges']}
         ]
     });
-    const Author = sequelize.define("author", {
+
+    const Address = sequelize.define("addresses", {
         id:{primaryKey:true,type:INTEGER,autoIncrement:true},
-        firstName: { type: Sequelize.STRING },
-        lastName: { type: Sequelize.STRING },
-        email: { type: Sequelize.STRING },
-        phone: { type: Sequelize.STRING },
-        bio: { type: Sequelize.TEXT },
+        hex: { type: STRING, unique: true },
+        user: { type: INTEGER,reference:{model:'users',key:'id'} },
+        city: { type: STRING },
+        state: { type: STRING },
+        country: { type: STRING },
+        building: { type: STRING },
+        coordinates: { type: STRING },
     },{
         timestamps: true,
-        tableName: 'authors',
+        tableName: 'addresses',
         indexes:[
-            {unique:true,fields:['email']},{fields:['lastName']},{fields:['firstName']},
-            {fields:['phone']},{fields:['createdAt']},{fields:['updatedAt']},
+            {unique:true,fields:['hex']},{fields:['user']},{fields:['city']},{fields:['state']},
+            {fields:['country']},{fields:['createdAt']},{fields:['updatedAt']},{fields:['building']},
+            {fields:['coordinates']}
         ]
     });
     
-
-    return{ Customer,Publisher,Author };
-};
+   
+    return { User, Role,Address };
+}

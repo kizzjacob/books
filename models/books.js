@@ -1,83 +1,83 @@
 module.exports = (sequelize, Sequelize) => {
     const{INTEGER,STRING,TEXT,DATE} = Sequelize;
-    const Book = sequelize.define("books", {
+
+    const Store = sequelize.define("stores", {
         id:{primaryKey:true,type:INTEGER,autoIncrement:true},
-        title: { type: Sequelize.STRING },
-        isbn: { type: Sequelize.STRING },
-        picture: { type: Sequelize.STRING },
-        description: { type: Sequelize.TEXT },
-        price: { type: Sequelize.INTEGER },
-        stock: { type: Sequelize.INTEGER },
-        author: { type: Sequelize.INTEGER,reference:{model:'authors',key:'id'} },
-        publisher: { type: Sequelize.INTEGER,reference:{model:'publishers',key:'id'} },
+        hex: { type: STRING, unique: true },
+        name: { type: STRING },
+        address: { type: STRING },
+        phone: { type: STRING },
+        email: { type: STRING,unique: true },
+       established: { type: DATE },
+       owner: { type: INTEGER,reference:{model:'users',key:'id'} },
     },{
         timestamps: true,
-        schema: '',
-        tableName: 'books',
+        tableName: 'stores',
         indexes:[
-            {unique:true,fields:['isbn']},{fields:['title']},{fields:['author']},
-            {fields:['publisher']},{fields:['price']},{fields:['stock']},
+            {unique:true,fields:['hex']},{unique:true,fields:['email']},{fields:['name']},{fields:['address']},
+            {fields:['phone']},{fields:['email']},{fields:['established']},{fields:['owner']},
             {fields:['createdAt']},{fields:['updatedAt']}
         ]
     });
+    const Book = sequelize.define("books", {
+        id:{primaryKey:true,type:INTEGER,autoIncrement:true},
+        hex: { type: STRING, unique: true },
+        title: { type: STRING },
+        desc: { type: TEXT },
+        isbn: { type: STRING, unique: true },
+        genre: { type: STRING },
+        tags: { type: STRING },
+    },{
+        timestamps: true,
+        tableName: 'books',
+        indexes:[
+            {unique:true,fields:['hex']},{unique:true,fields:['isbn']},{fields:['title']},{fields:['genre']},
+            {fields:['tags']},{fields:['createdAt']},{fields:['updatedAt']},
+        ]
+    });
+    const Author = sequelize.define("authors", {
+        id:{primaryKey:true,type:INTEGER,autoIncrement:true},
+        hex: { type: STRING, unique: true },
+        name: { type: STRING },
+        bio: { type: TEXT },
+        birthdate: { type: DATE },
+    },{
+        timestamps: true,
+        tableName: 'authors',
+        indexes:[
+            {unique:true,fields:['hex']},{fields:['name']},{fields:['birthdate']},
+            {fields:['createdAt']},{fields:['updatedAt']}
+        ]
+    });
+    const BookAuthor = sequelize.define("book_authors", {
+        id:{primaryKey:true,type:INTEGER,autoIncrement:true},
+        bookId: { type: INTEGER, reference: { model: 'books', key: 'hex' } },
+        authorId: { type: INTEGER, reference: { model: 'authors', key: 'hex' } },
 
-    const Genre = sequelize.define("genre", {
-        id:{primaryKey:true,type:INTEGER,autoIncrement:true},
-        name: { type: Sequelize.STRING }, 
     },{
         timestamps: true,
-        tableName: 'genres',
+        tableName: 'book_authors',
         indexes:[
-            {unique:true,fields:['name']},{fields:['createdAt']},{fields:['updatedAt']}
+            {fields:['bookId']},{fields:['authorId']},{fields:['createdAt']},{fields:['updatedAt']}
         ]
     });
-
-    const Order = sequelize.define("order", {
+    const Publisher = sequelize.define("publishers", {
         id:{primaryKey:true,type:INTEGER,autoIncrement:true},
-        customer: { type: Sequelize.INTEGER,reference:{model:'customers',key:'id'} },
-        totalAmount: { type: Sequelize.INTEGER, defaultValue: 0 },
-        status: { type: Sequelize.STRING, defaultValue: 'pending' },
-        date: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
-        shippingMethod: { type: Sequelize.STRING },
+        hex: { type: STRING, unique: true },
+        name: { type: STRING, unique: true },
+        bookId: { type: INTEGER, reference: { model: 'books', key: 'hex' } },
+        address: { type: STRING },
+        phone: { type: STRING },
+        email: { type: STRING, unique: true },
+        website: { type: STRING },
+        established: { type: DATE },
     },{
         timestamps: true,
-        tableName: 'orders',
+        tableName: 'publishers',
         indexes:[
-            {fields:['customer']},{fields:['status']},{fields:['date']},
-            {fields:['createdAt']},{fields:['updatedAt']},{fields:['shippingMethod']}
-            ,{fields:['totalAmount']}
+            {unique:true,fields:['hex']},{unique:true,fields:['name']},{unique:true,fields:['email']},
+            {fields:['bookId']},{fields:['address']},{fields:['phone']},{fields:['website']},
         ]
     });
-    const OrderItem = sequelize.define("orderItem", {
-        id:{primaryKey:true,type:INTEGER,autoIncrement:true},
-        orderId: { type: Sequelize.INTEGER,reference:{model:'orders',key:'id'} },
-        bookId: { type: Sequelize.INTEGER,reference:{model:'books',key:'id'} },
-        quantity: { type: Sequelize.INTEGER, defaultValue: 1 },
-        price: { type: Sequelize.INTEGER, defaultValue: 0 },
-    },{
-        timestamps: true,
-        tableName: 'orderItems',
-        indexes:[
-            {fields:['createdAt']},{fields:['updatedAt']},{fields:['price']},{fields:['quantity']}
-        ]
-    });
-    const Payment = sequelize.define("payment", {
-        id:{primaryKey:true,type:INTEGER,autoIncrement:true},
-        transactionId: { type: Sequelize.STRING, unique: true },
-        orderId: { type: Sequelize.INTEGER,reference:{model:'orders',key:'id'} },
-        amount: { type: Sequelize.INTEGER },
-        paymentMethod: { type: Sequelize.STRING },
-        paymentDate: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
-        status: { type: Sequelize.STRING, defaultValue: 'completed' },
-    
-    },{
-        timestamps: true,
-        tableName: 'payments',
-        indexes:[
-            {unique:true,fields:['transactionId']},{fields:['orderId']},{fields:['amount']},
-            {fields:['paymentMethod']},{fields:['paymentDate']},{fields:['status']},
-            {fields:['createdAt']},{fields:['updatedAt']},
-        ]
-    });
-        return{ Book,Genre,Order,OrderItem,Payment };
+    return { Store, Book, Author, BookAuthor,Publisher };
 }
